@@ -1,0 +1,29 @@
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+public class DeleteServlet extends HttpServlet {
+    private static final String UPLOAD_DIR = "uploads";
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        String filename = request.getParameter("filename");
+        String applicationPath = request.getServletContext().getRealPath("");
+        String filePath = applicationPath + File.separator + UPLOAD_DIR + File.separator + filename;
+
+        File file = new File(filePath);
+        HttpSession session = request.getSession();
+        
+        if (file.exists()) {
+            if (file.delete()) {
+                session.removeAttribute("uploadedFile");
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to delete file");
+            }
+        } else {
+            session.removeAttribute("uploadedFile");
+            response.setStatus(HttpServletResponse.SC_OK);
+        }
+    }
+}
